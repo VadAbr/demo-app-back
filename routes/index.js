@@ -3,18 +3,27 @@ const router = express.Router();
 const axios = require("axios");
 const cheerio = require("cheerio");
 
+
+const disabledSearch='&label=accept_handicapped'
+
 const urls = {
+    'russia': 'https://hh.ru/search/vacancy?L_save_area=true&text=&excluded_text=&area=113&salary=&currency_code=RUR&experience=doesNotMatter&order_by=relevance&search_period=0&items_on_page=50&hhtmFrom=vacancy_search_filter',
     'tuma': 'https://tuma.hh.ru/search/vacancy?L_save_area=true&text=&excluded_text=&area=4487&salary=&currency_code=RUR&experience=doesNotMatter&order_by=relevance&search_period=0&items_on_page=50&hhtmFrom=vacancy_search_filter',
     'spas-klepiki': 'https://spas-klepiki.hh.ru/search/vacancy?L_save_area=true&area=1713&items_on_page=50&hhtmFrom=vacancy_search_filter&search_field=name&search_field=company_name&search_field=description&enable_snippets=false&text='
 }
 
 /* GET home page. */
 router.get('/jobs', function (req, res, next) {
-    const url = urls[req.query.city]
+    let url = urls[req.query.city]
     if (!url) {
         res.send({jobs: []});
         return
     }
+
+    if(req.query.isForDisabled === 'true') {
+        url += disabledSearch
+    }
+
     axios
         .get(url, {
             headers: {
